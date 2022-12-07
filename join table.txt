@@ -1,0 +1,19 @@
+SELECT student_id,student_name,course_Name,officer_id,officer_name,adders FROM students INNER JOIN officer ON students.Student_Id = officer.officer_Id;  
+
+create table Students(S_id int NOT NULL PRIMARY KEY,S_Name varchar(28) NOT NULL ); 
+desc Student;
+insert into Students values(1,'Patel Maulik'),(2,'Patel Meet'),(3,'Patel Naksh'),(4,'Patel Nisarg');
+select * from Students;
+
+
+
+create table S_Mark(id int NOT NULL PRIMARY KEY,Marks int);
+insert into S_Mark values(1,90),(2,50),(3,70),(4,80);
+select * from S_Mark;
+
+
+SELECT S_id,S_Name,id,Marks FROM Students 
+INNER JOIN S_Mark ON Students.S_id = S_Mark.id;  
+
+
+
