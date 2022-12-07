@@ -1,0 +1,245 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using SeniorExamDemo.ViewModel;
+using iText.Kernel.Pdf;
+using iText.Kernel.Colors;
+using iText.Layout;
+using iText.Layout.Element;
+using iText.Layout.Properties;
+
+namespace SeniorExamDemo.Controllers
+{
+    public class HomeController : Controller
+    {
+        public ActionResult Index()
+        {
+            return View();
+        }
+
+        public ActionResult About()
+        {
+            ViewBag.Message = "Your application description page.";
+
+            return View();
+        }
+
+        public ActionResult Contact()
+        {
+            ViewBag.Message = "Your contact page.";
+
+            return View();
+        }
+
+        IndraEntities db = new IndraEntities();
+
+        public void generatePDF()
+        {
+            var BAPS = from e in db.Employees.ToList()
+                       join d in db.Departments.ToList() on e.E_Id equals d.E_Id
+                       select new allData
+                       {
+                           Employee = e,
+                           Department = d
+                       };
+            PdfWriter writer = new PdfWriter(@"D:\Sem 5\AIT 311  ADVANCE ASP.NET\Exam\SeniorExamDemo\SeniorExamDemo\JaySwaminarayan.pdf");
+            PdfDocument pdf = new PdfDocument(writer);
+            Document doc = new Document(pdf, iText.Kernel.Geom.PageSize.A4);
+
+            iText.Layout.Element.Table table = new iText.Layout.Element.Table(5);
+            table.SetHorizontalAlignment(HorizontalAlignment.CENTER);
+
+            Cell cell01 = new Cell(1, 1)
+                .SetHorizontalAlignment(HorizontalAlignment.CENTER)
+                .SetFontSize(12)
+                .SetBold()
+                .Add(new Paragraph("E_Id"));
+            Cell cell02 = new Cell(1, 1)
+                .SetHorizontalAlignment(HorizontalAlignment.CENTER)
+                .SetFontSize(12)
+                .SetBold()
+                .Add(new Paragraph("E_Name"));
+            Cell cell03 = new Cell(1, 1)
+                .SetHorizontalAlignment(HorizontalAlignment.CENTER)
+                .SetFontSize(12)
+                .SetBold()
+                .Add(new Paragraph("E_Salary"));
+            Cell cell04 = new Cell(1, 1)
+                .SetHorizontalAlignment(HorizontalAlignment.CENTER)
+                .SetFontSize(12)
+                .SetBold()
+                .Add(new Paragraph("D_Id"));
+            Cell cell05 = new Cell(1, 1)
+                .SetHorizontalAlignment(HorizontalAlignment.CENTER)
+                .SetFontSize(12)
+                .SetBold()
+                .Add(new Paragraph("D_Name"));
+            table.AddCell(cell01);
+            table.AddCell(cell02);
+            table.AddCell(cell03);
+            table.AddCell(cell04);
+            table.AddCell(cell05);
+
+            foreach (var item in BAPS)
+            {
+                Cell cell11 = new Cell(1, 1)
+                    .SetHorizontalAlignment(HorizontalAlignment.CENTER)
+                    .SetFontSize(12)
+                    .Add(new Paragraph(item.Employee.E_Id.ToString()));
+                Cell cell12 = new Cell(1, 1)
+                    .SetHorizontalAlignment(HorizontalAlignment.CENTER)
+                    .SetFontSize(12)
+                    .Add(new Paragraph(item.Employee.E_Name.ToString()));
+                Cell cell13 = new Cell(1, 1)
+                    .SetHorizontalAlignment(HorizontalAlignment.CENTER)
+                    .SetFontSize(12)
+                    .Add(new Paragraph(item.Employee.E_Salary.ToString()));
+                Cell cell14 = new Cell(1, 1)
+                    .SetHorizontalAlignment(HorizontalAlignment.CENTER)
+                    .SetFontSize(12)
+                    .Add(new Paragraph(item.Department.D_Id.ToString()));
+                Cell cell15 = new Cell(1, 1)
+                    .SetHorizontalAlignment(HorizontalAlignment.CENTER)
+                    .SetFontSize(12)
+                    .Add(new Paragraph(item.Department.D_Name.ToString()));
+                table.AddCell(cell11);
+                table.AddCell(cell12);
+                table.AddCell(cell13);
+                table.AddCell(cell14);
+                table.AddCell(cell15);
+            }
+
+            doc.Add(table);
+
+            doc.Close();
+            pdf.Close();
+            writer.Close();
+
+            Response.ContentType = "application/pdf";
+            Response.AddHeader("content-disposition", "attachment; JaySwaminarayan.pdf");
+            Response.WriteFile(@"D:\Sem 5\AIT 311  ADVANCE ASP.NET\Exam\SeniorExamDemo\SeniorExamDemo\JaySwaminarayan.pdf");
+            Response.End();
+        }
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using iText.Kernel.Pdf;
+using iText.Kernel.Font;
+using iText.Layout;
+using iText.Layout.Element;
+using iText.Layout.Properties;
+
+namespace Ch_3_Revision
+{
+    public partial class PDFDemo : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            PdfWriter writer = new PdfWriter(@"D:\Sem 5\AIT 311  ADVANCE ASP.NET\Exam\Ch 3 Revision\Ch 3 Revision\BAPS.pdf");
+            PdfDocument pdfDocument = new PdfDocument(writer);
+            Document doc = new Document(pdfDocument, iText.Kernel.Geom.PageSize.A4);
+
+            Paragraph p = new Paragraph();
+            p.Add("Jay Swaminarayan");
+            doc.Add(p);
+
+            iText.Layout.Element.Table table = new iText.Layout.Element.Table(2);
+
+            Cell cell11 = new Cell(1, 1)
+                .Add(new Paragraph("Rell NO"))
+                .SetBold();
+            Cell cell12 = new Cell(1, 1)
+                .Add(new Paragraph("Name"))
+                .SetBold();
+            table.AddCell(cell11);
+            table.AddCell(cell12);
+
+            Cell cell21 = new Cell(1, 1)
+                .Add(new Paragraph("14"));
+            Cell cell22 = new Cell(1, 1)
+                .Add(new Paragraph("Indra"));
+            table.AddCell(cell21);
+            table.AddCell(cell22);
+
+            doc.Add(table);
+
+            doc.Close();
+            pdfDocument.Close();
+            writer.Close();
+
+            Response.ContentType = "application/pdf";
+            Response.AddHeader("Content-Disposition", "attachment; BAPS.pdf");
+            Response.WriteFile(@"D:\Sem 5\AIT 311  ADVANCE ASP.NET\Exam\Ch 3 Revision\Ch 3 Revision\BAPS.pdf");
+            Response.End();
+
+        }
+    }
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data.SqlClient;
+using System.Data;
+using Microsoft.Reporting.WebForms;
+
+namespace Ch_3_Revision
+{
+    public partial class DynamicExecutionofReport : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            
+        }
+
+        protected void Report1btn_Click(object sender, EventArgs e)
+        {
+            ReportViewer1.LocalReport.ReportPath = @"D:\Sem 5\AIT 311  ADVANCE ASP.NET\Exam\Ch 3 Revision\Ch 3 Revision\Report1.rdlc";
+
+            ReportViewer1.ProcessingMode = ProcessingMode.Local;
+
+            SqlConnection connection = new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings["IndraConnectionString"].ConnectionString);
+            DataSet ds = new DataSet();
+            SqlDataAdapter sqlData = new SqlDataAdapter("Select * from students", connection);
+            sqlData.Fill(ds);
+
+            ReportDataSource rds = new ReportDataSource("DataSet1", ds.Tables[0]);
+
+            ReportViewer1.LocalReport.DataSources.Clear();
+            ReportViewer1.LocalReport.DataSources.Add(rds);
+
+            ReportViewer1.Visible = true;
+        }
+
+        protected void Report2btn_Click(object sender, EventArgs e)
+        {
+            ReportViewer1.LocalReport.ReportPath = @"D:\Sem 5\AIT 311  ADVANCE ASP.NET\Exam\Ch 3 Revision\Ch 3 Revision\Report2.rdlc";
+
+            ReportViewer1.ProcessingMode = ProcessingMode.Local;
+
+            SqlConnection connection = new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings["IndraConnectionString"].ConnectionString);
+            DataSet ds = new DataSet();
+            SqlDataAdapter sqlData = new SqlDataAdapter("Select * from Employee", connection);
+            sqlData.Fill(ds);
+
+            ReportDataSource rds = new ReportDataSource("DataSet1", ds.Tables[0]);
+
+            ReportViewer1.LocalReport.DataSources.Clear();
+            ReportViewer1.LocalReport.DataSources.Add(rds);
+
+            ReportViewer1.Visible = true;
+        }
+    }
+}
